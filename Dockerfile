@@ -1,5 +1,8 @@
 FROM python:3.6.9-buster
 
+RUN apt-get update && \
+    apt-get install -y unattended-upgrades
+
 RUN set -ex; \
 	\
 	wget -O get-pip.py 'https://bootstrap.pypa.io/get-pip.py'; \
@@ -21,10 +24,10 @@ RUN echo "deb http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
     apt-get update -y && apt-get install google-cloud-sdk vim -y
 
-# Install Argo
-RUN curl -Lo /usr/bin/argo https://storage.googleapis.com/amperon-static-web/argo-linux-amd64-3.1.6 && chmod a+x /usr/bin/argo
-RUN argo version
-
+# Install kubectl
+RUN curl -Lo /usr/local/bin/kubectl https://dl.k8s.io/release/v1.19.12/bin/linux/amd64/kubectl && \
+    chmod a+x /usr/local/bin/kubectl
+ 
 # Python packages
 WORKDIR /app
 RUN pip3 install setuptools
@@ -34,3 +37,5 @@ RUN pip3 install -r requirements.txt
 
 # setup dask
 RUN mkdir -p /dask
+
+RUN unattended-upgrade
